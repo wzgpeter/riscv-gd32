@@ -11,12 +11,12 @@
 #include "ledTask.h"
 #include "uartTask.h"
 #include "ledDrv.h"
-#include "pll.h"
+#include "rcu.h"
 
 
 void main(void)
 {
-	pll_init();
+	rcu_init();
 	led_init(GPIOF);
 	
 	vI2CTaskInit();

@@ -7,29 +7,21 @@
 #ifndef REGS_OP_H
 #define REGS_OP_H
 
-static inline uint32_t reg32_read(uint32_t reg)
-{
-	return *((volatile uint32_t *)reg);
-}
+#define		RCU_BASE		0x40021000
 
-static inline void reg32_write(uint32_t reg, uint32_t val)
-{
-	*((volatile uint32_t *)reg) = val;
-}
+#define		AFIO_BASE		0x40010000
+#define		GPIOA_BASE		0x40010800
+#define		GPIOB_BASE		0x40010C00
+#define		GPIOC_BASE		0x40011000
+#define		GPIOD_BASE		0x40011400
+#define		GPIOE_BASE		0x40011800
 
-static inline void reg32_update_bits(uint32_t reg, uint32_t mask, uint32_t val)
-{
-	reg32_write(reg, reg32_read(reg) & (~mask) | (val & mask));
-}
 
-static inline uint16_t reg16_read(uint32_t reg)
-{
-	return *((volatile uint16_t *)reg);
-}
+#define		HWREG(addr)		(*addr)
 
-static inline void reg16_write(uint32_t reg, uint16_t val)
-{
-	*((volatile uint16_t *)reg) = val;
-}
+#define		REG32(addr)		((volatile uint32_t *)(uint32_t)(addr))
+
+#define	BIT(x)					((uint32_t)((uint32_t)0x1U<<(x)))
+#define BITS(start, end)		((0xFFFFFFFFUL << (start)) & (0xFFFFFFFFUL >> (31U - (uint32_t)(end))))
 
 #endif //REGS_OP_H

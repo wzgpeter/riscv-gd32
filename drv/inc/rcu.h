@@ -325,6 +325,21 @@ typedef enum {
 
 } perip_clk_enable_enum;
 
+
+typedef enum
+{
+	CLKSRC_NULL 		= 0x00U,
+	CLKSRC_CK_SYS 		= 0x04U,
+	CLKSRC_IRC8M		= 0x05U,
+	CLKSRC_HXTAL		= 0x06U,
+	CLKSRC_CK_PLL_DIV2 	= 0x07U,
+	CLKSRC_CK_PLL1 		= 0x08U,
+	CLKSRC_CK_PLL2_DIV2 = 0x09U,
+	CLKSRC_EXT1 		= 0x0AU,
+	CLKSRC_CK_PLL2 		= 0x0BU,
+}clkout_src_enum;
+
+
 typedef struct 
 {
 	volatile uint32_t *ctl;
@@ -343,10 +358,12 @@ typedef struct
 }rcu_reg_cfg;
 
 
+extern void clkout_select(clkout_src_enum clk_src);
 extern void rcu_init(void);
 extern void perip_reset_enable(perip_reset_enum perip);
 extern void perip_reset_disable(perip_reset_enum perip);
 extern void perip_clk_enable(perip_clk_enable_enum perip);
 extern void perip_clk_disable(perip_clk_enable_enum perip);
+extern void _system_init(void);
 
 #endif //RCU_H

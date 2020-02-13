@@ -220,6 +220,8 @@ static void timer_init(timer_enum timer, uint32_t interval_ms)
 	default:
 		break;
 	}
+
+	HWREG(ptimer->swevg) |= TIMER_SWEVG_UPG; //generate update event
 }
 
 
@@ -307,8 +309,8 @@ static void timer_clk_enable(timer_enum timer)
 
 void timer_config(timer_enum timer, uint32_t interval)
 {
-	timer_clk_enable(timer);
 	timer_deinit(timer);
+	timer_clk_enable(timer);
 	timer_init(timer, interval);
 }
 

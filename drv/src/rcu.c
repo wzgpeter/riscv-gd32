@@ -10,7 +10,7 @@
 #include 	"regs_opt.h"
 #include 	"devRegs.h"
 #include 	"rcu.h"
-
+#include	"interrupt.h"
 
 static rcu_reg_cfg rcu_reg = 
 {
@@ -59,6 +59,11 @@ void rcu_init(void)
 	while(HWREG(rcu_reg.cfg0) & RCU_CFG0_SCSS(0x2) != RCU_CFG0_SCSS(0x2));
 }
 
+void clkout_select(clkout_src_enum clk_src)
+{
+	HWREG(rcu_reg.cfg0) |= RCU_CFG0_CKOUT0SEL(clk_src);
+}
+
 
 void perip_reset_enable(perip_reset_enum perip)
 {
@@ -81,3 +86,36 @@ void perip_clk_disable(perip_clk_enable_enum perip)
 	RCU_REG(perip) &= ~(BIT(REG_POS(perip)));
 }
 
+
+#define ECLIC_CFG_OFFSET			0x0
+#define ECLIC_MTH_OFFSET            0xB
+#define ECLIC_INT_IP_OFFSET         0x1000UL
+#define ECLIC_ADDR_BASE				0xd2000000
+
+void eclic_init ( uint32_t num_irq )
+{
+	typedef volatile uint32_t vuint32_t;
+
+	//clear cfg register 
+	*(volatile uint8_t*)(ECLIC_ADDR_BASE+ECLIC_CFG_OFFSET)=0;
+
+	//clear minthresh register 
+	*(volatile uint8_t*)(ECLIC_ADDR_BASE+ECLIC_MTH_OFFSET)=0;
+
+	//clear all IP/IE/ATTR/CTRL bits for all interrupt sources
+	vuint32_t * ptr;
+
+	vuint32_t * base = (vuint32_t*)(ECLIC_ADDR_BASE + ECLIC_INT_IP_OFFSET);
+	vuint32_t * upper = (vuint32_t*)(base + num_irq*4);
+
+	for (ptr = base; ptr < upper; ptr=ptr+4)
+	{
+		*ptr = 0;
+	}
+}
+
+void _system_init(void)
+{
+	rcu_init();
+	eclic_init(ECLIC_NUM_INTERRUPTS);
+}

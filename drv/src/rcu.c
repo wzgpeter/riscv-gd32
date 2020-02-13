@@ -12,7 +12,7 @@
 #include 	"rcu.h"
 
 
-rcu_reg_cfg rcu_reg = 
+static rcu_reg_cfg rcu_reg = 
 {
 	RCU_CTL,
 	RCU_CFG0,
@@ -40,7 +40,7 @@ void rcu_init(void)
 
 	HWREG(rcu_reg.cfg0) |= RCU_CFG0_AHBPSC(0);		//CK_AHB=CK_SYS
 	HWREG(rcu_reg.cfg0) |= RCU_CFG0_APB2PSC(0);		//CK_APB2=CK_AHB
-	HWREG(rcu_reg.cfg0) |= RCU_CFG0_APB1PSC(4);		//CK_APB1=CH_AHB/2
+	HWREG(rcu_reg.cfg0) |= RCU_CFG0_APB1PSC(0);		//CK_APB1=CH_AHB
 
 	//HXTAL=8MHz; SYS-CLK = 96MHz
 	HWREG(rcu_reg.cfg0) &= ~(RCU_CFG0_MASK_PLLMF | RCU_CFG0_MASK_PLLMF4);	//clear the bits
@@ -57,5 +57,27 @@ void rcu_init(void)
 	HWREG(rcu_reg.cfg0) &= ~RCU_CFG0_MASK_SCS;				//clear SCS bits
 	HWREG(rcu_reg.cfg0) |= RCU_CFG0_SCS(0x2);				//CK_PLL as CK_SYS
 	while(HWREG(rcu_reg.cfg0) & RCU_CFG0_SCSS(0x2) != RCU_CFG0_SCSS(0x2));
+}
+
+
+void perip_reset_enable(perip_reset_enum perip)
+{
+	RCU_REG(perip) |= BIT(REG_POS(perip));
+}
+
+void perip_reset_disable(perip_reset_enum perip)
+{
+	RCU_REG(perip) &= ~(BIT(REG_POS(perip)));
+}
+
+
+void perip_clk_enable(perip_clk_enable_enum perip)
+{
+	RCU_REG(perip) |= BIT(REG_POS(perip));
+}
+
+void perip_clk_disable(perip_clk_enable_enum perip)
+{
+	RCU_REG(perip) &= ~(BIT(REG_POS(perip)));
 }
 

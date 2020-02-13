@@ -9,6 +9,8 @@
 
 #define		RCU_BASE		0x40021000
 
+#define		EXTI_BASE		0x40010400
+
 #define		AFIO_BASE		0x40010000
 #define		GPIOA_BASE		0x40010800
 #define		GPIOB_BASE		0x40010C00
@@ -16,6 +18,13 @@
 #define		GPIOD_BASE		0x40011400
 #define		GPIOE_BASE		0x40011800
 
+#define		TIMER0_BASE		0x40012C00
+#define		TIMER1_BASE		0x40000000
+#define		TIMER2_BASE		0x40000400
+#define		TIMER3_BASE		0x40000800
+#define		TIMER4_BASE		0x40000C00
+#define		TIMER5_BASE		0x40001000
+#define		TIMER6_BASE		0x40001400
 
 #define		HWREG(addr)		(*addr)
 

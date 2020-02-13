@@ -179,7 +179,7 @@ void vPortEndScheduler( void )
  */
 static void prvSetupTimerInterrupt( void )
 {
-	timer0_init();
+	timer_config(TIMER1, 10);
 
 #if 0
 AT91PS_PITC pxPIT = AT91C_BASE_PITC;

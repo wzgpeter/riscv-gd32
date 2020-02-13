@@ -7,8 +7,8 @@
 
 	.section .init
 	
-    .weak  eclic_msip_handler
-    .weak  eclic_mtip_handler
+    .weak  eclic_sft_handler
+    .weak  eclic_tmr_handler
     .weak  eclic_bwei_handler
     .weak  eclic_pmovi_handler
     .weak  WWDGT_IRQHandler
@@ -72,16 +72,20 @@
     .weak  CAN1_EWMC_IRQHandler
     .weak  USBFS_IRQHandler
 
+
+#######################################################
+## Interrupt Vector Table
+##
 vector_base:
     j _start
     .align    2
     .word     0
     .word     0
-    .word     eclic_msip_handler
+    .word     eclic_sft_handler
     .word     0
     .word     0
     .word  	  0
-    .word  	  eclic_mtip_handler
+    .word  	  eclic_tmr_handler
     .word  	  0
     .word  	  0
     .word  	  0

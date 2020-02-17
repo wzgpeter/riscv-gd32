@@ -12,7 +12,7 @@
 #include "timers.h"
 
 #include "ledTask.h"
-#include "ledDrv.h"
+#include "gpio.h"
 
 TaskHandle_t xLedTaskHandle = NULL;
 
@@ -30,7 +30,6 @@ void vLEDTask(void *pvParameters)
 	TickType_t xTicksToWait;
 	const UBaseType_t AutoReload = pdTRUE;
 	BaseType_t LEDTimerID;
-	enum STATE state = LED_OFF;
 	TimerHandle_t xTimHandle;
 
 	xLastExecutionTime = xTaskGetTickCount();
@@ -49,7 +48,7 @@ void vLEDTask(void *pvParameters)
 	{
 		vTaskDelayUntil( &xLastExecutionTime, xTicksToWait );
 
-		led_switch(GPIOF, 4, state = (state == LED_ON ? LED_OFF : LED_ON));
+		//led_switch(GPIOF, 4, state = (state == LED_ON ? LED_OFF : LED_ON));
 	}
 }
 

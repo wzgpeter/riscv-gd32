@@ -13,7 +13,7 @@
 #include "timers.h"
 
 #include "uartTask.h"
-#include "ledDrv.h"
+#include "gpio.h"
 
 
 TaskHandle_t xUartTaskHandle = NULL;
@@ -33,7 +33,6 @@ void vUARTTask(void *pvParameters)
 	TickType_t xTicksToWait;
 	const UBaseType_t AutoReload = pdTRUE;
 	BaseType_t UARTTimerID;
-	enum STATE state = LED_OFF;
 	TimerHandle_t xTimHandle;
 
 	xLastExecutionTime = xTaskGetTickCount();
@@ -51,7 +50,7 @@ void vUARTTask(void *pvParameters)
 	{
 		vTaskDelayUntil( &xLastExecutionTime, xTicksToWait );
 		
-		led_switch(GPIOF, 6, state = (state == LED_ON ? LED_OFF : LED_ON));
+		//led_switch(GPIOF, 6, state = (state == LED_ON ? LED_OFF : LED_ON));
 	}
 }
 

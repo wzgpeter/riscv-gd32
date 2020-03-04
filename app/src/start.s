@@ -283,10 +283,7 @@ _start0800:
 	call	_system_init
 
 	## eclic interrupt mode enable
-	csrr	t0, mtvec
-	addi	t0, t0, 0xFFFFFFC0
-	ori		t0, t0, 0x00000003
-	csrw	mtvec, t0
+	csrs	mtvec, 0x00000003	## Use the ECLIC interrupt mode
 
 	## argc = argv = 0
 	li 		a0, 0

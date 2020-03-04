@@ -179,10 +179,11 @@ static timer_reg_struct timer_regs[] =
 	}
 };
 
-void TIMER1_IRQHandler(void)
+__attribute__((interrupt)) void TIMER1_IRQHandler(void)
 {
 	return;
 }
+
 
 static void timer_init(timer_enum timer, uint32_t interval_ms)
 {

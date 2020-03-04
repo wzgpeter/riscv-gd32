@@ -26,13 +26,6 @@ void main(void)
 	eclic_irq_enable(TIMER1_IRQn, 1, 0);
 	timer_config(TIMER1, 10);
 
-	while(1)
-	{
-		curr_cnt = get_timer_counter(TIMER1);
-		if (curr_cnt == 0)
-			continue;
-	};
-
 	vI2CTaskInit();
 	vLEDTaskInit();
 	vUARTTaskInit();

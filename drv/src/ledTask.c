@@ -38,11 +38,11 @@ void vLEDTask(void *pvParameters)
 	xTicksToWait = pdMS_TO_TICKS(500);
 	LEDTimerID = 0x33;
 	
-	taskENTER_CRITICAL();
-	xTimHandle = xTimerCreate("LEDTimer", xTicksToWait, AutoReload, &LEDTimerID, vLedTimrCallBack);
-	taskEXIT_CRITICAL();
+//	taskENTER_CRITICAL();
+//	xTimHandle = xTimerCreate("LEDTimer", xTicksToWait, AutoReload, &LEDTimerID, vLedTimrCallBack);
+//	taskEXIT_CRITICAL();
 
-	xResult = xTimerStart(xTimHandle, xTicksToWait);
+//	xResult = xTimerStart(xTimHandle, xTicksToWait);
 
 	while( 1 )
 	{

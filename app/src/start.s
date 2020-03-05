@@ -410,6 +410,151 @@ irq_entry:	## mtvt2 register will hold this label
 	mret	# return to regular code
 
 
+##################################################
+## macro for save all registers
+.macro portSAVE_CONTEXT_asm
+
+	/* Spare the space on stack */
+	addi		sp, sp, -33*4
+
+	/* Save all registers into Stack */
+	sw			x31, 32*4(sp)
+	sw			x30, 31*4(sp)
+	sw			x29, 30*4(sp)
+	sw			x28, 29*4(sp)
+	sw			x27, 28*4(sp)
+	sw			x26, 27*4(sp)
+	sw			x25, 26*4(sp)
+	sw			x24, 25*4(sp)
+	sw			x23, 24*4(sp)
+	sw			x22, 23*4(sp)
+	sw			x21, 22*4(sp)
+	sw			x20, 21*4(sp)
+	sw			x19, 20*4(sp)
+	sw			x18, 19*4(sp)
+	sw			x17, 18*4(sp)
+	sw			x16, 17*4(sp)
+	sw			x15, 16*4(sp)
+	sw			x14, 15*4(sp)
+	sw			x13, 14*4(sp)
+	sw			x12, 13*4(sp)
+	sw			x11, 12*4(sp)
+	sw			x10, 11*4(sp)
+	sw			x9,  10*4(sp)
+	sw			x8,	  9*4(sp)
+	sw			x7,	  8*4(sp)
+	sw			x6,	  7*4(sp)
+	sw			x5,	  6*4(sp)
+	sw			x4,	  5*4(sp)
+	sw			x3,	  4*4(sp)
+	sw			x1,	  3*4(sp)
+
+	/* Push return address into stack */
+	csrr		x5, mepc
+	addi		x5, x5, 4
+	sw			x5, 33*4(sp)
+
+	/* Push parameter into stack */
+	sw			x0, 2*4(sp)
+
+	/* Push mstatus into stack */
+	csrr		x5, mstatus
+	sw			x5, 1*4(sp)
+
+	/* Push 'ulCriticalNesting' into Stack */
+	la			x5, ulCriticalNesting
+	lw			x5, (x5)
+	sw			x5, (sp)
+
+	/* Store new top stack of task into 'pxCurrentTCB' */
+	la			x5, pxCurrentTCB
+	lw			x5, (x5)
+	sw			sp, (x5)
+.endm 	#end of this macro
+
+
+
+##############################################################################
+## macro for restore all registers
+
+.macro	portRESTORE_CONTEXT_asm
+	/* x6 points to Task's Stack Top */
+	la			x5, pxCurrentTCB
+	lw			x5, (x5)
+	lw			x6, (x5)
+
+	/* The critical nesting depth is the first item on the stack. */
+	/* Load it into the ulCriticalNesting variable. */
+	la			x5, ulCriticalNesting
+	lw			x7, (x6)
+	sw			x7, (x5)
+
+	/* Get the mstatus from the stack. */
+	lw			x7, 1*4(x6)
+	csrw		mstatus, x7
+
+	/* Restore all registers from the task. */
+	lw			x31, 32*4(x6)
+	lw			x30, 31*4(x6)
+	lw			x29, 30*4(x6)
+	lw			x28, 29*4(x6)
+	lw			x27, 28*4(x6)
+	lw			x26, 27*4(x6)
+	lw			x25, 26*4(x6)
+	lw			x24, 25*4(x6)
+	lw			x23, 24*4(x6)
+	lw			x22, 23*4(x6)
+	lw			x21, 22*4(x6)
+	lw			x20, 21*4(x6)
+	lw			x19, 20*4(x6)
+	lw			x18, 19*4(x6)
+	lw			x17, 18*4(x6)
+	lw			x16, 17*4(x6)
+	lw			x15, 16*4(x6)
+	lw			x14, 15*4(x6)
+	lw			x13, 14*4(x6)
+	lw			x12, 13*4(x6)
+	lw			x11, 12*4(x6)
+	lw			x10, 11*4(x6)
+	lw			x9,  10*4(x6)
+	lw			x8,	  9*4(x6)
+	lw			x7,	  8*4(x6)
+	lw			x5,	  6*4(x6)
+	lw			x4,	  5*4(x6)
+	lw			x3,	  4*4(x6)
+	lw			x1,	  3*4(x6)
+
+	/* get return address from stack */
+	lw			x2,	 33*4(x6)
+	csrw		mepc, x2
+
+	/* put sp pointer into mscratch */
+	addi		x2, x6, 33*4
+	csrw		mscratch, x2
+	lw			x6, 7*4(x6)
+
+	/* Return to Original Point */
+	mret
+.endm	#end of this macro
+
+
+##############################################################
+## task switching
+	.section	.text.trap
+	.align		6
+	.global		vPortYieldProcessor
+
+vPortYieldProcessor:
+	portSAVE_CONTEXT_asm
+
+	/* Find the highest priority task that is ready to run. */
+	jal		vTaskSwitchContext
+
+	portRESTORE_CONTEXT_asm
+Loop2:
+	j		Loop2
+
+
 
 ##############################################################
 ## TRAP entry point
@@ -419,12 +564,9 @@ irq_entry:	## mtvt2 register will hold this label
 	.global	trap_entry
 
 trap_entry:  ## mtvec register wil hold this lable
-	SAVE_CONTEXT
-	SAVE_EPC_STATUS
+	j		vPortYieldProcessor
 
-	##TODO ...
-
-	RESTORE_EPC_STATUS
-	RESTORE_CONTEXT
-	mret	# return to regular code
+Loop1:
+	j	Loop1
+	## Never touch here!
 

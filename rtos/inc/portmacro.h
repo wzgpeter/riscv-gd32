@@ -103,39 +103,71 @@ typedef unsigned long UBaseType_t;
  * are included here for efficiency.  An attempt to call one from
  * THUMB mode code will result in a compile time error.
  */
-#define portRESTORE_CONTEXT() 
-#define portSAVE_CONTEXT()
-
-#if 0
 #define portRESTORE_CONTEXT()											\
 {																		\
 extern volatile void * volatile pxCurrentTCB;							\
 extern volatile uint32_t ulCriticalNesting;								\
 																		\
 	/* Set the LR to the task stack. */									\
-	__asm volatile (													\
-	/* LR points to Task's Stack Top */									\
-	"LDR		R0, =pxCurrentTCB								\n\t"	\
-	"LDR		R0, [R0]										\n\t"	\
-	"LDR		LR, [R0]										\n\t"	\
+	asm volatile (														\
+	/* x6 points to Task's Stack Top */									\
+	"la			x5, pxCurrentTCB								\n\t"	\
+	"lw			x5, (x5)										\n\t"	\
+	"lw			x6, (x5)										\n\t"	\
 																		\
 	/* The critical nesting depth is the first item on the stack. */	\
 	/* Load it into the ulCriticalNesting variable. */					\
-	"LDR		R0, =ulCriticalNesting							\n\t"	\
-	"LDMIA		LR!, {R1}										\n\t"	\
-	"STR		R1, [R0]										\n\t"	\
+	"la			x5, ulCriticalNesting							\n\t"	\
+	"lw			x7, (x6)										\n\t"	\
+	"sw			x7, (x5)										\n\t"	\
 																		\
-	/* Get the SPSR from the stack. */									\
-	"LDMIA		LR!, {R1}										\n\t"	\
-	"MSR		SPSR, R1										\n\t"	\
+	/* Get the mstatus from the stack. */								\
+	"lw			x7, 1*4(x6)										\n\t"	\
+	"csrw		mstatus, x7										\n\t"	\
 																		\
-	/* Restore all system mode registers for the task. */				\
-	"LDMIA		LR, {R0-R14}^									\n\t"	\
-	"NOP														\n\t"	\
+	/* Restore all registers from the task. */							\
+	"lw			x31, 32*4(x6)									\n\t"	\
+	"lw			x30, 31*4(x6)									\n\t"	\
+	"lw			x29, 30*4(x6)									\n\t"	\
+	"lw			x28, 29*4(x6)									\n\t"	\
+	"lw			x27, 28*4(x6)									\n\t"	\
+	"lw			x26, 27*4(x6)									\n\t"	\
+	"lw			x25, 26*4(x6)									\n\t"	\
+	"lw			x24, 25*4(x6)									\n\t"	\
+	"lw			x23, 24*4(x6)									\n\t"	\
+	"lw			x22, 23*4(x6)									\n\t"	\
+	"lw			x21, 22*4(x6)									\n\t"	\
+	"lw			x20, 21*4(x6)									\n\t"	\
+	"lw			x19, 20*4(x6)									\n\t"	\
+	"lw			x18, 19*4(x6)									\n\t"	\
+	"lw			x17, 18*4(x6)									\n\t"	\
+	"lw			x16, 17*4(x6)									\n\t"	\
+	"lw			x15, 16*4(x6)									\n\t"	\
+	"lw			x14, 15*4(x6)									\n\t"	\
+	"lw			x13, 14*4(x6)									\n\t"	\
+	"lw			x12, 13*4(x6)									\n\t"	\
+	"lw			x11, 12*4(x6)									\n\t"	\
+	"lw			x10, 11*4(x6)									\n\t"	\
+	"lw			x9,  10*4(x6)									\n\t"	\
+	"lw			x8,	  9*4(x6)									\n\t"	\
+	"lw			x7,	  8*4(x6)									\n\t"	\
+	"lw			x5,	  6*4(x6)									\n\t"	\
+	"lw			x4,	  5*4(x6)									\n\t"	\
+	"lw			x3,	  4*4(x6)									\n\t"	\
+	"lw			x1,	  3*4(x6)									\n\t"	\
 																		\
-	/* Restore Return Address */										\
-	"LDR		LR, [LR, #60]									\n\t"	\
-	"SUBS		PC, LR, #4										\n\t"	\
+	/* get return address from stack */									\
+	"lw			x2,	 33*4(x6)									\n\t"	\
+	"csrw		mepc, x2										\n\t"	\
+																		\
+	/* put sp pointer into mscratch */									\
+	"addi		x2, x6, 33*4									\n\t"	\
+	"csrw		mscratch, x2									\n\t"	\
+																		\
+	"lw			x6, 7*4(x6)										\n\t"	\
+																		\
+	/* Return to Original Point */										\
+	"mret														\n\t"	\
 	);																	\
 	( void ) ulCriticalNesting;											\
 	( void ) pxCurrentTCB;												\
@@ -148,53 +180,71 @@ extern volatile void * volatile pxCurrentTCB;							\
 extern volatile uint32_t ulCriticalNesting;								\
 																		\
 	/* Push R0 as we are going to use the register. */					\
-	__asm volatile (													\
-	/* Store R0 into SWI's Stack */										\
-	"STMDB	SP!, {R0}											\n\t"	\
+	asm volatile (														\
+	/* Spare the space on stack */										\
+	"addi		sp, sp, -33*4									\n\t"	\
 																		\
-	/* Store Task-Thread's SP into SWI's Stack */						\
-	"STMDB	SP, {SP}^											\n\t"	\
-	"NOP														\n\t"	\
-	"SUB	SP, SP, #4											\n\t"	\
+	/* Save all registers into Stack */									\
+	"sw			x31, 32*4(sp)									\n\t"	\
+	"sw			x30, 31*4(sp)									\n\t"	\
+	"sw			x29, 30*4(sp)									\n\t"	\
+	"sw			x28, 29*4(sp)									\n\t"	\
+	"sw			x27, 28*4(sp)									\n\t"	\
+	"sw			x26, 27*4(sp)									\n\t"	\
+	"sw			x25, 26*4(sp)									\n\t"	\
+	"sw			x24, 25*4(sp)									\n\t"	\
+	"sw			x23, 24*4(sp)									\n\t"	\
+	"sw			x22, 23*4(sp)									\n\t"	\
+	"sw			x21, 22*4(sp)									\n\t"	\
+	"sw			x20, 21*4(sp)									\n\t"	\
+	"sw			x19, 20*4(sp)									\n\t"	\
+	"sw			x18, 19*4(sp)									\n\t"	\
+	"sw			x17, 18*4(sp)									\n\t"	\
+	"sw			x16, 17*4(sp)									\n\t"	\
+	"sw			x15, 16*4(sp)									\n\t"	\
+	"sw			x14, 15*4(sp)									\n\t"	\
+	"sw			x13, 14*4(sp)									\n\t"	\
+	"sw			x12, 13*4(sp)									\n\t"	\
+	"sw			x11, 12*4(sp)									\n\t"	\
+	"sw			x10, 11*4(sp)									\n\t"	\
+	"sw			x9,  10*4(sp)									\n\t"	\
+	"sw			x8,	  9*4(sp)									\n\t"	\
+	"sw			x7,	  8*4(sp)									\n\t"	\
+	"sw			x6,	  7*4(sp)									\n\t"	\
+	"sw			x5,	  6*4(sp)									\n\t"	\
+	"sw			x4,	  5*4(sp)									\n\t"	\
+	"sw			x3,	  4*4(sp)									\n\t"	\
+	"sw			x1,	  3*4(sp)									\n\t"	\
 																		\
-	/* Move Task-Thread's SP into R0 register */						\
-	"LDMIA	SP!, {R0}											\n\t"	\
+	/* Push return address into stack */								\
+	"csrr		x5, mepc										\n\t"	\
+	"addi		x5, x5, 4										\n\t"	\
+	"sw			x5, 33*4(sp)									\n\t"	\
 																		\
-	/* Store Return Addr into Task's Stack; LR as Stack Pointer */		\
-	"STMDB	R0, {LR}											\n\t"	\
-	"NOP														\n\t"	\
-	"SUB	LR, R0, #4											\n\t"	\
+	/* Push parameter into stack */										\
+	"sw			x0, 2*4(sp)										\n\t"	\
 																		\
-	/* Pop R0 from SUP's Stack; never use this Stack any more */		\
-	"LDMIA	SP!, {R0}											\n\t"	\
-																		\
-	/* Push SYS's register into area pointed by LR */					\
-	"STMDB	LR, {R0-R14}^										\n\t"	\
-	"NOP														\n\t"	\
-	"SUB	LR, LR, #60											\n\t"	\
-																		\
-	/* Push SPSR into Stack */											\
-	"MRS	R0, SPSR											\n\t"	\
-	"STMDB	LR!, {R0}											\n\t"	\
+	/* Push mstatus into stack */										\
+	"csrr		x5, mstatus										\n\t"	\
+	"sw			x5, 1*4(sp)										\n\t"	\
 																		\
 	/* Push 'ulCriticalNesting' into Stack */							\
-	"LDR	R0, =ulCriticalNesting								\n\t"	\
-	"LDR	R0, [R0]											\n\t"	\
-	"STMDB	LR!, {R0}											\n\t"	\
+	"la			x5, ulCriticalNesting							\n\t"	\
+	"lw			x5, (x5)										\n\t"	\
+	"sw			x5, (sp)										\n\t"	\
 																		\
 	/* Store new top stack of task into 'pxCurrentTCB' */				\
-	"LDR	R0, =pxCurrentTCB									\n\t"	\
-	"LDR	R0, [R0]											\n\t"	\
-	"STR	LR, [R0]											\n\t"	\
+	"la			x5, pxCurrentTCB								\n\t"	\
+	"lw			x5, (x5)										\n\t"	\
+	"sw			sp, (x5)										\n\t"	\
 																		\
 	);																	\
 	( void ) ulCriticalNesting;											\
 	( void ) pxCurrentTCB;												\
 }
-#endif
 
 #define portYIELD_FROM_ISR()		vTaskSwitchContext()
-#define portYIELD()					//__asm volatile ( "SWI 0" )
+#define portYIELD()					asm volatile ( "ecall" )
 /*-----------------------------------------------------------*/
 
 

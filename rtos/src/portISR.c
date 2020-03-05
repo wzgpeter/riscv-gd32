@@ -79,6 +79,7 @@ void vPortISRStartFirstTask( void )
  * way the same restore context function can be used when restoring the context
  * saved from the ISR or that saved from a call to vPortYieldProcessor.
  */
+#if 0
 void vPortYieldProcessor( void )
 {
 	/* Within an IRQ ISR the link register has an offset from the true return 
@@ -95,6 +96,8 @@ void vPortYieldProcessor( void )
 	/* Restore the context of the new task. */
 	portRESTORE_CONTEXT();	
 }
+#endif
+
 /*-----------------------------------------------------------*/
 
 /* 

@@ -3395,6 +3395,21 @@ static portTASK_FUNCTION( prvIdleTask, pvParameters )
 		}
 		#endif /* configUSE_IDLE_HOOK */
 
+
+		/* trigger task switch if there are ready tasks other than IDLE task */
+		{
+			UBaseType_t uxTopPriority = configMAX_PRIORITIES;
+			while ( uxTopPriority-- <= configMAX_PRIORITIES )
+			{
+				if ( !listLIST_IS_EMPTY( &( pxReadyTasksLists[ uxTopPriority ] ) ) )
+				{
+					taskYIELD();
+					break;
+				}
+			}
+		}
+
+
 		/* This conditional compilation should use inequality to 0, not equality
 		to 1.  This is to ensure portSUPPRESS_TICKS_AND_SLEEP() is called when
 		user defined low power mode	implementations require

@@ -40,11 +40,11 @@ void vUARTTask(void *pvParameters)
 	xTicksToWait = pdMS_TO_TICKS(100);
 	UARTTimerID = 0x11;
 	
-	taskENTER_CRITICAL();
-	xTimHandle = xTimerCreate("UARTTimer", xTicksToWait, AutoReload, &UARTTimerID, vUartTimrCallBack);
-	taskEXIT_CRITICAL();
+//	taskENTER_CRITICAL();
+//	xTimHandle = xTimerCreate("UARTTimer", xTicksToWait, AutoReload, &UARTTimerID, vUartTimrCallBack);
+//	taskEXIT_CRITICAL();
 
-	xResult = xTimerStart(xTimHandle, xTicksToWait);
+//	xResult = xTimerStart(xTimHandle, xTicksToWait);
 
 	while( 1 )
 	{

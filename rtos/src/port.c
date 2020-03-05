@@ -47,7 +47,7 @@
 //#include "AT91SAM7X256.h"
 
 /* Constants required to setup the task context. */
-#define portINITIAL_SPSR				( ( StackType_t ) 0x10 ) /* User mode, ARM mode, interrupts enabled. */
+#define portINITIAL_MSTATUS				( ( StackType_t ) ((0x1 << 3) | (0x1 << 7) | (0x3 << 11)) ) /* User mode, Interrupts enabled. */
 #define portTHUMB_MODE_BIT				( ( StackType_t ) 0x20 )
 #define portINSTRUCTION_SIZE			( ( StackType_t ) 4 )
 #define portNO_CRITICAL_SECTION_NESTING	( ( StackType_t ) 0 )
@@ -100,47 +100,78 @@ StackType_t *pxOriginalTOS;
 	/* First on the stack is the return address - which in this case is the
 	start of the task.  The offset is added to make the return address appear
 	as it would within an IRQ ISR. */
-	*pxTopOfStack = ( StackType_t ) pxCode + portINSTRUCTION_SIZE;		/* R14 -- Return Address */
+	*pxTopOfStack = ( StackType_t ) pxCode;		/* Return Address */
 	pxTopOfStack--;
-	*pxTopOfStack = ( StackType_t ) 0x14141414;	/* R14 */
+
+	*pxTopOfStack = ( StackType_t ) 0x31313131;	/* x31 */
 	pxTopOfStack--;
-	
-	*pxTopOfStack = ( StackType_t ) pxOriginalTOS; /* Stack used when task starts goes in R13. */
+	*pxTopOfStack = ( StackType_t ) 0x30303030; /* x30 */
 	pxTopOfStack--;
-	*pxTopOfStack = ( StackType_t ) 0x12121212;	/* R12 */
+	*pxTopOfStack = ( StackType_t ) 0x29292929;	/* x29 */
 	pxTopOfStack--;	
-	*pxTopOfStack = ( StackType_t ) 0x11111111;	/* R11 */
+	*pxTopOfStack = ( StackType_t ) 0x28282828;	/* x28 */
 	pxTopOfStack--;	
-	*pxTopOfStack = ( StackType_t ) 0x10101010;	/* R10 */
+	*pxTopOfStack = ( StackType_t ) 0x27272727;	/* x27 */
+	pxTopOfStack--;
+	*pxTopOfStack = ( StackType_t ) 0x26262626;	/* x26 */
+	pxTopOfStack--;
+	*pxTopOfStack = ( StackType_t ) 0x25252525;	/* x25 */
+	pxTopOfStack--;
+	*pxTopOfStack = ( StackType_t ) 0x24242424;	/* x24 */
+	pxTopOfStack--;
+	*pxTopOfStack = ( StackType_t ) 0x23232323;	/* x23 */
+	pxTopOfStack--;
+	*pxTopOfStack = ( StackType_t ) 0x22222222;	/* x22 */
+	pxTopOfStack--;
+	*pxTopOfStack = ( StackType_t ) 0x21212121;	/* x21 */
+	pxTopOfStack--;
+	*pxTopOfStack = ( StackType_t ) 0x20202020;	/* x20 */
+	pxTopOfStack--;
+	*pxTopOfStack = ( StackType_t ) 0x19191919;	/* x19 */
+	pxTopOfStack--;
+	*pxTopOfStack = ( StackType_t ) 0x18181818;	/* x18 */
+	pxTopOfStack--;
+	*pxTopOfStack = ( StackType_t ) 0x17171717;	/* x17 */
 	pxTopOfStack--;	
-	*pxTopOfStack = ( StackType_t ) 0x09090909;	/* R9 */
+	*pxTopOfStack = ( StackType_t ) 0x16161616;	/* x16 */
 	pxTopOfStack--;	
-	*pxTopOfStack = ( StackType_t ) 0x08080808;	/* R8 */
+	*pxTopOfStack = ( StackType_t ) 0x15151515;	/* x15 */
 	pxTopOfStack--;	
-	*pxTopOfStack = ( StackType_t ) 0x07070707;	/* R7 */
+	*pxTopOfStack = ( StackType_t ) 0x14141414;	/* x14 */
 	pxTopOfStack--;	
-	*pxTopOfStack = ( StackType_t ) 0x06060606;	/* R6 */
+	*pxTopOfStack = ( StackType_t ) 0x13131313;	/* x13 */
 	pxTopOfStack--;	
-	*pxTopOfStack = ( StackType_t ) 0x05050505;	/* R5 */
+	*pxTopOfStack = ( StackType_t ) 0x12121212;	/* x12 */
 	pxTopOfStack--;	
-	*pxTopOfStack = ( StackType_t ) 0x04040404;	/* R4 */
+	*pxTopOfStack = ( StackType_t ) 0x11111111;	/* x11 */
 	pxTopOfStack--;	
-	*pxTopOfStack = ( StackType_t ) 0x03030303;	/* R3 */
+	*pxTopOfStack = ( StackType_t ) 0x10101010;	/* x10 */
+	pxTopOfStack--;
+	*pxTopOfStack = ( StackType_t ) 0x09090909;	/* x9 */
+	pxTopOfStack--;
+	*pxTopOfStack = ( StackType_t ) 0x08080808;	/* x8 */
+	pxTopOfStack--;
+	*pxTopOfStack = ( StackType_t ) 0x07070707;	/* x7 */
 	pxTopOfStack--;	
-	*pxTopOfStack = ( StackType_t ) 0x02020202;	/* R2 */
-	pxTopOfStack--;	
-	*pxTopOfStack = ( StackType_t ) 0x01010101;	/* R1 */
-	pxTopOfStack--;	
+	*pxTopOfStack = ( StackType_t ) 0x06060606;	/* x6 */
+	pxTopOfStack--;
+	*pxTopOfStack = ( StackType_t ) 0x05050505;	/* x5 */
+	pxTopOfStack--;
+	*pxTopOfStack = ( StackType_t ) 0x04040404;	/* x4 */
+	pxTopOfStack--;
+	*pxTopOfStack = ( StackType_t ) 0x03030303;	/* x3 */
+	pxTopOfStack--;
+	*pxTopOfStack = ( StackType_t ) 0x01010101;	/* x1 */
+	pxTopOfStack--;
 
 	/* When the task starts is will expect to find the function parameter in
-	R0. */
-	*pxTopOfStack = ( StackType_t ) pvParameters; /* R0 */
+	a2. */
+	*pxTopOfStack = ( StackType_t ) pvParameters; /* a2 */
 	pxTopOfStack--;
 
 	/* The last thing onto the stack is the status register, which is set for
 	system mode, with interrupts enabled. */
-	*pxTopOfStack = ( StackType_t ) portINITIAL_SPSR;
-
+	*pxTopOfStack = ( StackType_t ) portINITIAL_MSTATUS;
 	pxTopOfStack--;
 
 	/* Some optimisation levels use the stack differently to others.  This 

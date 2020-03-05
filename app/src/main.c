@@ -21,13 +21,11 @@ void main(void)
 {
 	volatile uint32_t curr_cnt= 0;
 
-	glob_intr_enable();
 	eclic_set_nlbits(ECLIC_INTCTLBITS);
 	eclic_irq_enable(TIMER1_IRQn, 1, 0);
-	timer_config(TIMER1, 10);
 
 	vI2CTaskInit();
-	vLEDTaskInit();
+//	vLEDTaskInit();
 	vUARTTaskInit();
 
 	vTaskStartScheduler();

@@ -181,6 +181,7 @@ static timer_reg_struct timer_regs[] =
 
 __attribute__((interrupt)) void TIMER1_IRQHandler(void)
 {
+	xTaskIncrementTick();
 	return;
 }
 

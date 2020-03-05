@@ -38,11 +38,11 @@ void vI2CTask(void *pvParameters)
 	xTicksToWait = pdMS_TO_TICKS(200);
 	I2CTimerID = 0x22;
 
-	taskENTER_CRITICAL();
-	xTimHandle = xTimerCreate("I2CTimer", xTicksToWait, AutoReload, &I2CTimerID, vI2cTimrCallBack);
-	taskEXIT_CRITICAL();
+//	taskENTER_CRITICAL();
+//	xTimHandle = xTimerCreate("I2CTimer", xTicksToWait, AutoReload, &I2CTimerID, vI2cTimrCallBack);
+//	taskEXIT_CRITICAL();
 
-	xResult = xTimerStart(xTimHandle, xTicksToWait);
+//	xResult = xTimerStart(xTimHandle, xTicksToWait);
 
 	while( 1 )
 	{

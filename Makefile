@@ -17,18 +17,18 @@ CUR_DIR := $(shell pwd)
 
 
 # define the root directory list here
-SUBDIRS = \
-		app \
-		drv \
-		lib \
-		rtos
+SRC_DIRS = \
+	app \
+	drv \
+	lib \
+	rtos
 
 
 # list all of sub-directory here
-dirs := $(shell find $(SUBDIRS) -type d)
+sub-dirs := $(shell find $(SRC_DIRS) -type d)
 
-INC_PATH := $(patsubst %, -I./%, $(dirs))
-SRC_PATH := $(patsubst %, ./%, $(dirs))
+INC_PATH := $(patsubst %, -I./%, $(sub-dirs))
+SRC_PATH := $(patsubst %, ./%,   $(sub-dirs))
 
 VPATH := $(SRC_PATH) 	#the system VPATH
 

@@ -11,8 +11,22 @@ OBJDUMP = $(PREFIX)objdump
 
 OUTPUT_PATH = ./build
 
-INC_PATH := $(patsubst ./%, -I./%, $(shell find ./ -type d))
-SRC_PATH := $(patsubst ./%, ./%, $(shell find ./ -type d))
+CUR_DIR := $(shell pwd)
+
+
+SUBDIRS = \
+		app \
+		drv \
+		lib \
+		rtos
+
+
+dirs := $(shell find $(SUBDIRS) -type d)
+
+#INC_PATH := $(patsubst ./%, -I./%, $(shell find ./ -type d))
+#SRC_PATH := $(patsubst ./%, ./%, $(shell find ./ -type d))
+INC_PATH := $(patsubst %, -I./%, $(dirs))
+SRC_PATH := $(patsubst %, ./%, $(dirs))
 
 VPATH := $(SRC_PATH) 	#the system VPATH
 

@@ -11,9 +11,12 @@ OBJDUMP = $(PREFIX)objdump
 
 OUTPUT_PATH = ./build
 
+
+# get current directory
 CUR_DIR := $(shell pwd)
 
 
+# define the root directory list here
 SUBDIRS = \
 		app \
 		drv \
@@ -21,10 +24,9 @@ SUBDIRS = \
 		rtos
 
 
+# list all of sub-directory here
 dirs := $(shell find $(SUBDIRS) -type d)
 
-#INC_PATH := $(patsubst ./%, -I./%, $(shell find ./ -type d))
-#SRC_PATH := $(patsubst ./%, ./%, $(shell find ./ -type d))
 INC_PATH := $(patsubst %, -I./%, $(dirs))
 SRC_PATH := $(patsubst %, ./%, $(dirs))
 

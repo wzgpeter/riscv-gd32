@@ -11,19 +11,11 @@ OBJDUMP = $(PREFIX)objdump
 
 OUTPUT_PATH = ./build
 
-INC_APP_PATH = ./app/inc
-INC_DRV_PATH = ./drv/inc
-INC_RTOS_PATH = ./rtos/inc
+INC_PATH := $(patsubst ./%, -I./%, $(shell find ./ -type d))
+SRC_PATH := $(patsubst ./%, ./%, $(shell find ./ -type d))
 
-SRC_APP_PATH = ./app/src
-SRC_DRV_PATH = ./drv/src
-SRC_RTOS_PATH = ./rtos/src
-SRC_LIB_PATH = ./lib
+VPATH := $(SRC_PATH) 	#the system VPATH
 
-INC_PATH := -I$(INC_APP_PATH) -I$(INC_DRV_PATH) -I$(INC_RTOS_PATH)
-SRC_PATH := $(SRC_APP_PATH) $(SRC_DRV_PATH) $(SRC_RTOS_PATH) $(SRC_LIB_PATH)
-
-VPATH := $(SRC_APP_PATH) : $(SRC_DRV_PATH) : $(SRC_RTOS_PATH) : $(SRC_LIB_PATH) 	#the system VPATH
 
 CFLAGS = -O0 -g --compile -march=rv32imac -mabi=ilp32 -std=gnu11 -fno-builtin -fmessage-length=0 -fsigned-char
 AFLAGS = -g -march=rv32imac -mabi=ilp32
